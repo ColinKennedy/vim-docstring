@@ -78,7 +78,7 @@ def get_node_folds(root, lines):
 
 
 def get_open_folds():
-    '''list[`ast.Node`]: Find every node that has a docstring which is folded.'''
+    '''tuple[`ast.Module`, list[`ast.Node`]]: Find every node that has a docstring which is folded.'''
     root, lines = get_current_buffer_root_node()
 
     folds = []
@@ -86,7 +86,25 @@ def get_open_folds():
         if is_fold_open(start):
             folds.append(node)
 
-    return folds
+    return (root, folds)
+
+
+def get_parent_nodes(node):
+    '''list[`ast.Node`]: Find every node that `node` is a part of.'''
+    def _get_parent(node):
+        try:
+            return node.parent
+        except AttributeError:
+            return None
+
+    parent = _get_parent(node)
+    parents = []
+
+    while parent:
+        parents.append(parent)
+        parent = _get_parent(parent)
+
+    return parents
 
 
 def get_valid_nodes(root):
@@ -111,3 +129,10 @@ def get_valid_nodes(root):
         nodes.append(node)
 
     return nodes
+
+
+def attach_parents(root):
+    '''Add a `parent` attribute to each child node in `root`.'''
+    for node in ast.walk(root):
+        for child in ast.iter_child_nodes(node):
+            child.parent = node
