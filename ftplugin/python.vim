@@ -15,45 +15,47 @@ if !has('pythonx')
     finish
 endif
 
+
 function! PyDocHide()
     setlocal foldmethod=manual
 pythonx << EOF
-import vim
-import ast
-import re
+from vim_docstring import vim_docstring_python
 
 try:
-    lines = list(vim.current.buffer)
-    root = ast.parse("\n".join(lines))
-    for node in ast.walk(root):
-        if not isinstance(node, (ast.Module, ast.FunctionDef, ast.ClassDef)):
-            continue
-        if ast.get_docstring(node) is None:
-            continue
-        first_child = node.body[0]
-        if not isinstance(first_child, ast.Expr):
-            continue
-        end = first_child.lineno
-        if '"""' in lines[end - 1]:
-            bracket = '"""'
-        elif "'''" in lines[end - 1]:
-            bracket = "'''"
-        else:
-            continue
-        if re.search(bracket + '.*' + bracket, lines[end - 1]):
-            start = end
-        else:
-            start = node.lineno if hasattr(node, 'lineno') else 1
-            for i, line in enumerate(lines[end-2 : start-1 : -1]):
-                if bracket in line:
-                    start = end - i - 1
-                    break
-            else:
-                continue
-        vim.command("%d,%dfold" % (start, end))
+    vim_docstring_python.set_folds()
 except Exception as e:
     print("Error: %s" % (e,))
 EOF
 endfunction
 
-command! PyDocHide call PyDocHide()
+
+function! s:PySaveOpenedFolds()
+pythonx << EOF
+from vim_docstring import vim_docstring_python
+vim_docstring_python.save_opened_folds()
+EOF
+endfunction
+
+
+function! s:PyRestoreOpenedFolds()
+pythonx << EOF
+from vim_docstring import vim_docstring_python
+vim_docstring_python.restore_opened_folds()
+EOF
+endfunction
+
+
+function! s:PySaveAndRestoreFolds(command)
+    PySaveOpenedFolds
+    execute a:command
+    " Delete all of the existing folds
+    normal zE
+    PyDocHide
+    PyRestoreOpenedFolds
+endfunction
+
+
+command! -bar PyDocHide call PyDocHide()
+command! -bar -nargs=0 PySaveOpenedFolds call s:PySaveOpenedFolds()
+command! -bar -nargs=1 PySaveAndRestoreFolds call s:PySaveAndRestoreFolds(<f-args>)
+command! -bar -nargs=0 PyRestoreOpenedFolds call s:PyRestoreOpenedFolds()
