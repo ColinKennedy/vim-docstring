@@ -4,6 +4,7 @@
 '''The main module that is responsible for creating and opening folds.'''
 
 # IMPORT THIRD-PARTY LIBRARIES
+import logging
 import vim
 
 # IMPORT LOCAL LIBRARIES
@@ -11,6 +12,7 @@ from . import common
 
 
 DEFAULT_VARIABLE = 'b:vim_docstring_open_folds'
+LOGGER = logging.getLogger('vim_docstring')
 
 
 def set_folds():
