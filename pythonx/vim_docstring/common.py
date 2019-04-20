@@ -20,9 +20,17 @@ import vim
 def is_fold_open(line):
     '''bool: If the given, 1-based line number is part of a closed fold.'''
     try:
-        return vim.eval('foldclosed({line})'.format(line=line)) == '-1'
+        if vim.eval('foldlevel({line})'.format(line=line)) == '0':
+            # There is no fold here. Therefore it cannot be open
+            return False
+
+        if vim.eval('foldclosed({line})'.format(line=line)) == '-1':
+            # There is a fold at this line and it is open
+            return True
     except Exception:
         return False
+
+    return False
 
 
 def get_current_buffer_root_node():
