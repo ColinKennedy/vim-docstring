@@ -5,6 +5,7 @@
 
 # IMPORT THIRD-PARTY LIBRARIES
 import logging
+import ast
 import vim
 
 # IMPORT LOCAL LIBRARIES
@@ -13,6 +14,7 @@ from . import common
 
 DEFAULT_VARIABLE = 'b:vim_docstring_open_folds'
 LOGGER = logging.getLogger('vim_docstring')
+MODULE_NAME = '28088f48-c828-459e-91f7-b670aedd745b'
 
 
 def set_folds():
@@ -25,9 +27,18 @@ def set_folds():
 
 def _get_unique_name(node):
     '''str: Get a special name for the given `ast.Node`.'''
+    if isinstance(node, ast.Module):
+        # It's possible to have a module-level-docstring but `ast.Module` doesn't
+        # have `name` so we just insert some random hash to use in-place of a
+        # unique name
+        #
+        name = MODULE_NAME
+    else:
+        name = node.name
+
     parents = common.get_parent_nodes(node)
     parent_names = [parent.name for parent in parents if hasattr(parent, 'name')]
-    return ':'.join(parent_names + [node.name])
+    return ':'.join(parent_names + [name])
 
 
 def save_opened_folds(variable=DEFAULT_VARIABLE):
