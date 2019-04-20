@@ -32,7 +32,11 @@ endfunction
 function! s:PySaveOpenedFolds()
 pythonx << EOF
 from vim_docstring import vim_docstring_python
-vim_docstring_python.save_opened_folds()
+try:
+    vim_docstring_python.save_opened_folds()
+except (IndentationError, SyntaxError):
+    # If this errors then most likely the file is just WIP. Just ignore it
+    pass
 EOF
 endfunction
 
@@ -40,7 +44,11 @@ endfunction
 function! s:PyRestoreOpenedFolds()
 pythonx << EOF
 from vim_docstring import vim_docstring_python
-vim_docstring_python.restore_opened_folds()
+try:
+    vim_docstring_python.restore_opened_folds()
+except (IndentationError, SyntaxError):
+    # If this errors then most likely the file is just WIP. Just ignore it
+    pass
 EOF
 endfunction
 
