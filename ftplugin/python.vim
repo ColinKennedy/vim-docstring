@@ -53,13 +53,31 @@ EOF
 endfunction
 
 
+" This function is meant to be run after Python folds have been
+" destroyed by another function call. (For example, if you run isort or
+" black or something on an open buffer).
+"
+" Important: To make sure opened folds are restored correcty, you must
+" run `PySaveOpenedFolds` before running the function that destroys
+" folds and then run `PyClearAndRestoreFolds` afterwards.
+"
+" :PySaveOpenedFolds
+" :SomeFunctionThatBreaksFolds
+" :PyClearAndRestoreFolds
+"
+function! s:PyClearAndRestoreFolds()
+    " Delete all of the existing folds
+    normal zE
+
+    PyDocHide
+    PyRestoreOpenedFolds
+endfunction
+
+
 function! s:PySaveAndRestoreFolds(command)
     PySaveOpenedFolds
     execute a:command
-    " Delete all of the existing folds
-    normal zE
-    PyDocHide
-    PyRestoreOpenedFolds
+    PyClearAndRestoreFolds
 endfunction
 
 
@@ -67,3 +85,4 @@ command! -bar PyDocHide call PyDocHide()
 command! -bar -nargs=0 PySaveOpenedFolds call s:PySaveOpenedFolds()
 command! -bar -nargs=1 PySaveAndRestoreFolds call s:PySaveAndRestoreFolds(<f-args>)
 command! -bar -nargs=0 PyRestoreOpenedFolds call s:PyRestoreOpenedFolds()
+command! -bar -nargs=0 PyClearAndRestoreFolds call s:PyClearAndRestoreFolds()
