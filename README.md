@@ -3,7 +3,7 @@
 Python docstrings are great for helping others, but are sometimes too verbose
 for a developer. Fold them with ease with this vim plugin.
 
-![](./example.png)
+![](https://user-images.githubusercontent.com/10103049/59969885-e7591800-950d-11e9-92ed-c417f23dc87c.png)
 
 ## Install
 
