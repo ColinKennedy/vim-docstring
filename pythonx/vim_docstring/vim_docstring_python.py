@@ -14,6 +14,7 @@ from . import common
 
 DEFAULT_VARIABLE = 'b:vim_docstring_open_folds'
 LOGGER = logging.getLogger('vim_docstring')
+LOGGER.setLevel(logging.INFO)
 MODULE_NAME = '28088f48-c828-459e-91f7-b670aedd745b'
 
 
@@ -54,7 +55,7 @@ def restore_opened_folds(variable=DEFAULT_VARIABLE):
     try:
         opened_folds = vim.eval(variable)
     except Exception:
-        LOGGER.exception('Variable "{variable}" has no recorded, opened folds.'.format(variable=variable))
+        LOGGER.debug('Variable "%s" has no recorded, opened folds.', variable, exc_info=True)
         return
 
     root, lines = common.get_current_buffer_root_node()
