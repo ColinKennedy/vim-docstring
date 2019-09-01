@@ -67,7 +67,7 @@ endfunction
 "
 function! s:PyClearAndRestoreFolds()
     " Delete all of the existing folds
-    normal zE
+    normal! zE
 
     PyDocHide
     PyRestoreOpenedFolds
